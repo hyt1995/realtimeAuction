@@ -37,21 +37,39 @@ module.exports = (server,app)=>{
         });
 
         socket.on("inspectionBid",(data)=>{
-            io.emit("test","테스트를 위한 임시로 보내는 메세지");
-        })
-        // 프론트에서 메세지를 socket로 보내면 이벤트에서
-        // clearInterval 하고 다시 socket.interval = setInterval(sendIntervalCountDown, 1000)
-        // 을 실행시킨다.
+            console.log("맨 위에 확인",data,app.get("resentPrice"))
+            clearInterval(socket.interval)
 
-        let count = 10;
+            if(data.price === 1000){
+                app.set("resentPrice",1000);
+                console.log("첫번째",data, app.get("resentPrice"));
+                io.emit('bidCompleted', {
+                    price:data.price + 1000
+                })
+            } else if(app.get("resentPrice") <= data.price){ // 가격이 더 크거나 같으면 올라간 가격을 제공
+                app.set("resentPrice",data.price);
+                console.log("두번째",data, app.get("resentPrice"));
+                io.emit('bidCompleted', {
+                    price:data.price + 1000
+                })
+            }
+        })
+
+        app.set("forCount",10);
 
         const sendIntervalCountDown  = () => {
-            if(count !== 0){
-                io.emit('intervalCountDown', count);
-                count -= 1;
+            let forSend = app.get("forCount");
+            if(forSend !== 0){
+                io.emit('intervalCountDown', forSend);
+                // forSend -= 1;
+                app.set("forCount",forSend -1);
             }else {
                 io.emit('intervalCountDown', "낙찰이 완료되었습니다.");
                 clearInterval(socket.interval);
+                // axios.post('http://localhost:8083/successfullBidding',{
+                //     // 여기서 브랜드 이름 가격 상품 이름을 저장할 예정입니다.
+                // ++++++++++++++++++++++++ 여기서 낙찰일 경우 서버에다 브랜드 이름 현재 가격 상품 이름을 전달해주면 된다.
+                // })
             }
         }
 
