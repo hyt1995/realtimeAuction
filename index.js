@@ -154,20 +154,13 @@ app.post("/successfullBidding",async (req,res)=>{
             console.log("여기서 결과 확인",saveGoodName);
             
             if(saveGoodName){
-                req.app.get("io").of('/').emit('bidCompleted',{
-                    data:{
+                return req.app.get("io").of('/').emit('bidCompleted',{
                         code:200,
                         result:saveGoodName,
                         data:true,
-                        price:req.body.price  + 1000,
-                    }
+                        price:req.body.price,
+                        success:true,
                 })
-                return res.status(200).json({
-                    code:200,
-                    result:saveGoodName,
-                    data:true,
-                    price:req.body.price  + 1000,
-                });
             }
 
         }
