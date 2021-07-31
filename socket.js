@@ -82,7 +82,7 @@ module.exports = (server, app) => {
 				clearInterval(socket.interval);
 				axios
 					.post('http://localhost:8083/successfullBidding', {
-						price: app.get('resentPrice') + 1000,
+						price: app.get('resentPrice') + 1000 || 1000,
 						goodName: app.get('resentGoodName') || '',
 						brandName: socket.decoded.name || '',
 					})
